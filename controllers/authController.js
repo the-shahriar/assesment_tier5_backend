@@ -1,4 +1,5 @@
-const User = require("../models/User");
+const User = require("../models/user");
+const { createResponse } = require("../utils/responseGenerator");
 // const jwt = require("../lib/jwt");
 
 module.exports.signUp = async (req, res, next) => {
@@ -14,7 +15,7 @@ module.exports.signUp = async (req, res, next) => {
 
     const user = new User(body);
     await user.save();
-    return res.json(user, "Registration successful!");
+    return res.json(createResponse(user, "Registration Successful"));
   } catch (err) {
     next(err);
   }
@@ -24,20 +25,29 @@ module.exports.login = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
-      throw new Error("No user with this email!");
+      res.json(createResponse(null, "User does not exist with this email"));
     }
     const isValidPassword = await user.isValidPassword(req.body.password);
     if (!isValidPassword) {
-      throw new Error("Incorrect email or password!");
+      res.json(createResponse(null, "Password is invalid"));
     }
-    return res.json({
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      country: user.country,
-      gender: user.gender,
-      device: user.device,
-    });
+    return res
+      .cookie("SSID", user._id, {
+        maxAge: 72000000,
+      })
+      .json(
+        createResponse(
+          {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            country: user.country,
+            gender: user.gender,
+            device: user.device,
+          },
+          "Login Successful"
+        )
+      );
   } catch (err) {
     next(err);
   }
@@ -45,7 +55,38 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.authUser = async (req, res, next) => {
   try {
-    return res.json(req.user);
+    const userId = req.cookies["SSID"];
+    if (userId === undefined) {
+      res.json(createResponse(null));
+    } else {
+      const user = await User.findOne({ _id: userId });
+      return res.json(
+        createResponse({
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          country: user.country,
+          gender: user.gender,
+          device: user.device,
+        })
+      );
+    }
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.logOut = async (req, res, next) => {
+  try {
+    const userId = req.cookies["SSID"];
+    if (userId === undefined) {
+      res.json(createResponse(null, "User already loggedout"));
+    } else {
+      const user = await User.findOne({ _id: userId });
+      return res
+        .clearCookie("SSID")
+        .json(createResponse(null, "Logout Successful"));
+    }
   } catch (err) {
     next(err);
   }

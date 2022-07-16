@@ -1,14 +1,18 @@
 const express = require("express");
 const app = express();
-const db = require("./db/db");
 const cors = require("cors");
 const device = require("express-device");
+const routes = require("./routes/index");
+const db = require("./db/db");
+const cookieParser = require("cookie-parser");
 
 require("dotenv").config();
 // Pass the global passport object into the configuration function
 app.use(cors());
 app.use(express.json());
 app.use(device.capture());
+app.use(cookieParser());
+app.use("/api", routes);
 
 //error handler
 const port = process.env.PORT || 4000;

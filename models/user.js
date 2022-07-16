@@ -56,6 +56,4 @@ UserSchema.methods.isValidPassword = async function (password) {
   return compare;
 };
 
-UserSchema.plugin(require("mongoose-beautiful-unique-validation"));
-
-module.exports = mongoose.model("User", UserSchema);
+module.exports = mongoose.model("users", UserSchema);
