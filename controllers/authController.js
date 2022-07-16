@@ -6,8 +6,10 @@ module.exports.signUp = async (req, res, next) => {
     const body = {
       name: req.body.name,
       email: req.body.email,
-      phone: req.body.phone,
+      gender: req.body.gender,
+      country: req.body.country,
       password: req.body.password,
+      device: req.device.type,
     };
 
     const user = new User(body);
@@ -29,11 +31,12 @@ module.exports.login = async (req, res, next) => {
       throw new Error("Incorrect email or password!");
     }
     return res.json({
+      id: user._id,
       name: user.name,
       email: user.email,
-      id: user._id,
       country: user.country,
       gender: user.gender,
+      device: user.device,
     });
   } catch (err) {
     next(err);
@@ -42,7 +45,7 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.authUser = async (req, res, next) => {
   try {
-    return res.json(createResponse(req.user));
+    return res.json(req.user);
   } catch (err) {
     next(err);
   }
