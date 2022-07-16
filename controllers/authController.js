@@ -1,6 +1,5 @@
 const User = require("../models/user");
 const { createResponse } = require("../utils/responseGenerator");
-// const jwt = require("../lib/jwt");
 
 module.exports.signUp = async (req, res, next) => {
   try {
