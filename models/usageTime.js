@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const UserSchema = require("./user");
+const User = require("./user");
 
 const { Schema } = mongoose;
 mongoose.Promise = global.Promise;
@@ -7,14 +7,15 @@ mongoose.Promise = global.Promise;
 const UserActivity = new Schema(
   {
     userId: {
-      type: Schema.Types.ObjectId,
-      ref: UserSchema,
+      type: String,
+      required: [true, "UserId is required"],
+      trim: true,
     },
     loggedIn: {
       type: Date,
       default: Date.now,
     },
-    loggedIn: {
+    logOut: {
       type: Date,
       default: Date.now,
     },

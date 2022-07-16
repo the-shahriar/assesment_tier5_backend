@@ -1,5 +1,7 @@
 const User = require("../models/user");
+const UserActivity = require("../models/usageTime");
 const { createResponse } = require("../utils/responseGenerator");
+const addHours = require("date-fns/addHours");
 
 module.exports.signUp = async (req, res, next) => {
   try {
@@ -30,8 +32,18 @@ module.exports.login = async (req, res, next) => {
     if (!isValidPassword) {
       res.json(createResponse(null, "Password is invalid"));
     }
+    const body = {
+      userId: user._id,
+      loggedIn: addHours(new Date(), 6),
+      logOut: null,
+    };
+    const activity = new UserActivity(body);
+    const logActivity = await activity.save();
     return res
       .cookie("SSID", user._id, {
+        maxAge: 72000000,
+      })
+      .cookie("activityId", logActivity._id, {
         maxAge: 72000000,
       })
       .json(
@@ -78,12 +90,17 @@ module.exports.authUser = async (req, res, next) => {
 module.exports.logOut = async (req, res, next) => {
   try {
     const userId = req.cookies["SSID"];
+    const activityId = req.cookies["activityId"];
+
     if (userId === undefined) {
       res.json(createResponse(null, "User already loggedout"));
     } else {
-      const user = await User.findOne({ _id: userId });
+      await UserActivity.findByIdAndUpdate(activityId, {
+        logOut: addHours(new Date(), 6),
+      });
       return res
         .clearCookie("SSID")
+        .clearCookie("activityId")
         .json(createResponse(null, "Logout Successful"));
     }
   } catch (err) {
