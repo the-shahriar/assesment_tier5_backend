@@ -67,7 +67,6 @@ module.exports.login = async (req, res, next) => {
 module.exports.authUser = async (req, res, next) => {
   try {
     const userId = req.user;
-    console.log(userId);
     const user = await User.findOne({ _id: userId });
     return res.json(
       createResponse({
