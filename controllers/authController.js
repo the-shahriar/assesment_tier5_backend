@@ -3,7 +3,7 @@ const UserActivity = require("../models/usageTime");
 const { createResponse } = require("../utils/responseGenerator");
 const addHours = require("date-fns/addHours");
 
-module.exports.signUp = async (req, res, next) => {
+module.exports.addUser = async (req, res, next) => {
   try {
     const body = {
       name: req.body.name,
@@ -66,22 +66,19 @@ module.exports.login = async (req, res, next) => {
 
 module.exports.authUser = async (req, res, next) => {
   try {
-    const userId = req.cookies["SSID"];
-    if (userId === undefined) {
-      res.json(createResponse(null));
-    } else {
-      const user = await User.findOne({ _id: userId });
-      return res.json(
-        createResponse({
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          country: user.country,
-          gender: user.gender,
-          device: user.device,
-        })
-      );
-    }
+    const userId = req.user;
+    console.log(userId);
+    const user = await User.findOne({ _id: userId });
+    return res.json(
+      createResponse({
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        country: user.country,
+        gender: user.gender,
+        device: user.device,
+      })
+    );
   } catch (err) {
     next(err);
   }
@@ -89,21 +86,20 @@ module.exports.authUser = async (req, res, next) => {
 
 module.exports.logOut = async (req, res, next) => {
   try {
-    const userId = req.cookies["SSID"];
     const activityId = req.cookies["activityId"];
-
-    if (userId === undefined) {
-      res.json(createResponse(null, "User already loggedout"));
-    } else {
-      await UserActivity.findByIdAndUpdate(activityId, {
-        logOut: addHours(new Date(), 6),
-      });
-      return res
-        .clearCookie("SSID")
-        .clearCookie("activityId")
-        .json(createResponse(null, "Logout Successful"));
-    }
+    await UserActivity.findByIdAndUpdate(activityId, {
+      logOut: addHours(new Date(), 6),
+    });
+    return res
+      .clearCookie("SSID")
+      .clearCookie("activityId")
+      .json(createResponse(null, "Logout Successful"));
   } catch (err) {
     next(err);
   }
+};
+
+module.exports.removeUser = async (req, res, next) => {
+  const result = await User.findByIdAndRemove({ _id: req.cookies["SSID"] });
+  res.json(createResponse(result, "User has been deleted."));
 };
