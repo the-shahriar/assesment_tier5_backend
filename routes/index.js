@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const auth = require("./auth");
+const report = require("./activeUser");
 
-router.use("/v1", auth);
+router.use("/auth", auth);
+router.use("/report", report);
 
 module.exports = router;
