@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(device.capture());
 app.use(cookieParser());
 app.use(errorHandler);
-app.use("/api", routes);
+app.use("/api/v1", routes);
 
 //error handler
 const port = process.env.PORT || 4000;
