@@ -143,7 +143,6 @@ module.exports.filterByUsageTime = async (req, res, next) => {
     // all user with usage time
     const actualResult = Object.keys(response).reduce((acc, key) => {
       const { usage } = calUsageTime(response[key]);
-
       // push data to the main array
       acc.push({
         userId: key,
@@ -157,18 +156,24 @@ module.exports.filterByUsageTime = async (req, res, next) => {
       if (n > arr.length) {
         return false;
       }
-      return arr
+      const result = arr
         .sort((a, b) => {
           return b.duration - a.duration;
         })
         .slice(0, n);
+
+      const userName = result.map((item) => item.userId);
+      return userName;
     };
 
     // getting the top 15
-    const result = topN(actualResult, 5);
+    const top5 = topN(actualResult, 5);
+
+    // getting user information of top5
+    const users = await User.find({ _id: { $in: top5 } }).select("email");
 
     // send response
-    res.json(createResponse(result));
+    res.json(createResponse(users));
   } catch (err) {
     next(err);
   }
