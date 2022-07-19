@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const UserActivity = require("../models/usageTime");
 const { createResponse } = require("../utils/responseGenerator");
 
 // get country list
@@ -94,7 +95,80 @@ module.exports.filterByDevice = async (req, res, next) => {
 // filter user using top usage time
 module.exports.filterByUsageTime = async (req, res, next) => {
   try {
-    // res.json(createResponse(data));
+    // get log activity
+    const actvity = await UserActivity.find({})
+      .select(["userId", "loggedIn", "logOut"])
+      .where("logOut")
+      .ne(null);
+
+    // new array by calculating duration of logout and login
+    let newArray = [];
+    actvity.forEach((item) => {
+      const duration = item.logOut - item.loggedIn;
+      const obj = {
+        _id: item._id,
+        userId: item.userId,
+        duration,
+      };
+      newArray.push(obj);
+    });
+
+    // create an object with activity data by a specific user.
+    const response = newArray.reduce((object, item) => {
+      if (object[item["userId"]]) {
+        object[item["userId"]].push({
+          duration: item.duration,
+        });
+      } else {
+        object[item["userId"]] = [
+          {
+            duration: item.duration,
+          },
+        ];
+      }
+      return object;
+    }, {});
+
+    // function to calculate data
+    const calUsageTime = (array) => {
+      const usage = array.reduce((accumulator, object) => {
+        return accumulator + object.duration;
+      }, 0);
+
+      return {
+        usage,
+      };
+    };
+
+    // all user with usage time
+    const actualResult = Object.keys(response).reduce((acc, key) => {
+      const { usage } = calUsageTime(response[key]);
+
+      // push data to the main array
+      acc.push({
+        userId: key,
+        duration: usage,
+      });
+      return acc;
+    }, []);
+
+    // function to find top 15 user
+    const topN = (arr, n) => {
+      if (n > arr.length) {
+        return false;
+      }
+      return arr
+        .sort((a, b) => {
+          return b.duration - a.duration;
+        })
+        .slice(0, n);
+    };
+
+    // getting the top 15
+    const result = topN(actualResult, 5);
+
+    // send response
+    res.json(createResponse(result));
   } catch (err) {
     next(err);
   }
