@@ -170,10 +170,14 @@ module.exports.filterByUsageTime = async (req, res, next) => {
     const top5 = topN(actualResult, 5);
 
     // getting user information of top5
-    const users = await User.find({ _id: { $in: top5 } }).select("email");
+    if (top5) {
+      const users = await User.find({ _id: { $in: top5 } }).select("email");
+      res.json(createResponse(users));
+    } else {
+      res.json(createResponse(null, "Some error is there!"));
+    }
 
     // send response
-    res.json(createResponse(users));
   } catch (err) {
     next(err);
   }
