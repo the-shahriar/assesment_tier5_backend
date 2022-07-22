@@ -1,6 +1,7 @@
 const User = require("../models/user");
 const UserActivity = require("../models/usageTime");
 const { createResponse } = require("../utils/responseGenerator");
+const user = require("../models/user");
 
 // get country list
 module.exports.getCountry = async (req, res, next) => {
@@ -30,7 +31,7 @@ because of low option in both fields
 module.exports.filterByCountry = async (req, res, next) => {
   try {
     // get country name
-    const countryName = req.body.country;
+    const countryName = req.headers.country;
     // get country list
     const users = await User.find({
       country: countryName,
@@ -52,10 +53,10 @@ module.exports.filterByCountry = async (req, res, next) => {
 module.exports.filterByGender = async (req, res, next) => {
   try {
     // get country name
-    const genderName = req.body.gender;
+    const genderName = req.headers.gender;
     // get country list
     const users = await User.find({
-      country: genderName,
+      gender: genderName,
     }).select(["_id", "name", "email", "gender", "device", "country"]);
 
     // actual data
@@ -74,10 +75,10 @@ module.exports.filterByGender = async (req, res, next) => {
 module.exports.filterByDevice = async (req, res, next) => {
   try {
     // get country name
-    const deviceName = req.body.device;
+    const deviceName = req.headers.device;
     // get country list
     const users = await User.find({
-      country: deviceName,
+      device: deviceName,
     }).select(["_id", "name", "email", "gender", "device", "country"]);
 
     // actual data
@@ -161,18 +162,26 @@ module.exports.filterByUsageTime = async (req, res, next) => {
           return b.duration - a.duration;
         })
         .slice(0, n);
-
-      const userName = result.map((item) => item.userId);
-      return userName;
+      return result;
     };
 
     // getting the top 15
-    const top5 = topN(actualResult, 5);
+    const top15 = topN(actualResult, 15);
+    const userIds = top15.map((item) => item.userId);
 
     // getting user information of top5
-    if (top5) {
-      const users = await User.find({ _id: { $in: top5 } }).select("email");
-      res.json(createResponse(users));
+    if (top15) {
+      let users = await User.find({ _id: { $in: userIds } }).select("email");
+
+      let newUser = [];
+      users.forEach((user) => {
+        top15.forEach((obj) => {
+          if (user._id == obj.userId) {
+            newUser.push({ email: user.email, duration: obj.duration });
+          }
+        });
+      });
+      res.json(createResponse(newUser));
     } else {
       res.json(createResponse(null, "Some error is there!"));
     }

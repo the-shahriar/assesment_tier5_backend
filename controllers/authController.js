@@ -42,9 +42,11 @@ module.exports.login = async (req, res, next) => {
     return res
       .cookie("SSID", user._id, {
         maxAge: 72000000,
+        httpOnly: true,
       })
       .cookie("activityId", logActivity._id, {
         maxAge: 72000000,
+        httpOnly: true,
       })
       .json(
         createResponse(
@@ -89,16 +91,20 @@ module.exports.logOut = async (req, res, next) => {
     await UserActivity.findByIdAndUpdate(activityId, {
       logOut: addHours(new Date(), 6),
     });
-    return res
-      .clearCookie("SSID")
-      .clearCookie("activityId")
-      .json(createResponse(null, "Logout Successful"));
+    res.clearCookie("SSID");
+    res.clearCookie("activityId");
+    res.json(createResponse(null, "Logout Successful"));
+    return res;
   } catch (err) {
     next(err);
   }
 };
 
 module.exports.removeUser = async (req, res, next) => {
-  const result = await User.findByIdAndRemove({ _id: req.cookies["SSID"] });
-  res.json(createResponse(result, "User has been deleted."));
+  try {
+    const result = await User.findByIdAndRemove({ _id: req.cookies["SSID"] });
+    return res.json(createResponse(result, "User has been deleted."));
+  } catch (err) {
+    next(err);
+  }
 };

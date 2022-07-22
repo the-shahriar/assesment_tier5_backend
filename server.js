@@ -9,7 +9,13 @@ const errorHandler = require("./middlewares/error");
 
 require("dotenv").config();
 // Pass the global passport object into the configuration function
-app.use(cors());
+
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:3000",
+  })
+);
 app.use(express.json());
 app.use(device.capture());
 app.use(cookieParser());

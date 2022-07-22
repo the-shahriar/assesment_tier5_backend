@@ -74,15 +74,16 @@ module.exports.activeUserList = async (req, res, next) => {
     const totalActiveUser = await UserActivity.find({}).distinct("userId");
 
     // actual data
-    const data = {
-      totalUser,
-      activeUser: totalActiveUser.length,
-      daily: daily.length,
-      weekly: weekly.length,
-      monthly: monthly.length,
-    };
 
-    res.json(createResponse(data));
+    const dataArray = [
+      { name: "totalUser", value: totalUser },
+      { name: "activeUser", value: totalActiveUser.length },
+      { name: "today", value: daily.length },
+      { name: "last7days", value: weekly.length },
+      { name: "last30days", value: monthly.length },
+    ];
+
+    res.json(createResponse(dataArray));
   } catch (err) {
     next(err);
   }
