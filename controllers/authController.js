@@ -42,11 +42,9 @@ module.exports.login = async (req, res, next) => {
     return res
       .cookie("SSID", user._id, {
         maxAge: 72000000,
-        httpOnly: true,
       })
       .cookie("activityId", logActivity._id, {
         maxAge: 72000000,
-        httpOnly: true,
       })
       .json(
         createResponse(
