@@ -39,26 +39,20 @@ module.exports.login = async (req, res, next) => {
     };
     const activity = new UserActivity(body);
     const logActivity = await activity.save();
-    return res
-      .cookie("SSID", user._id, {
-        maxAge: 72000000,
-      })
-      .cookie("activityId", logActivity._id, {
-        maxAge: 72000000,
-      })
-      .json(
-        createResponse(
-          {
-            id: user._id,
-            name: user.name,
-            email: user.email,
-            country: user.country,
-            gender: user.gender,
-            device: user.device,
-          },
-          "Login Successful"
-        )
-      );
+    return res.json(
+      createResponse(
+        {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          country: user.country,
+          gender: user.gender,
+          device: user.device,
+          activityId: logActivity._id,
+        },
+        "Login Successful"
+      )
+    );
   } catch (err) {
     next(err);
   }
@@ -89,8 +83,6 @@ module.exports.logOut = async (req, res, next) => {
     await UserActivity.findByIdAndUpdate(activityId, {
       logOut: addHours(new Date(), 6),
     });
-    res.clearCookie("SSID");
-    res.clearCookie("activityId");
     res.json(createResponse(null, "Logout Successful"));
     return res;
   } catch (err) {
