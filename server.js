@@ -13,7 +13,7 @@ require("dotenv").config();
 app.use(
   cors({
     credentials: true,
-    origin: "https://darling-dragon-8bd912.netlify.app/",
+    origin: "https://darling-dragon-8bd912.netlify.app",
   })
 );
 app.use(express.json());
