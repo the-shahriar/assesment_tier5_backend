@@ -99,4 +99,18 @@ git push heroku main
 
 ![image](https://drive.google.com/uc?export=view&id=1j-IlawdkbWgS-q0S4XhL2uopR6PDmLus)
 
+
+## How I will manage 10+ million of user in database?
+I assume 10+ millions of user is stored in a database. So, millions of users in table are not a big deal for any useful database. If it means manage millions of simultaneous connections for queries! Then we might need more than just a database or just one server. We may need network architecture. 
+
+But there are some prerequisite i.e. need to index the data properly and queries should written in a good way although can handle the connections with connection pool, which allows many concurrent apps to share efficiently a finite set of database connections. 
+
+Beside this we can use a temporary database i.e. Redis to read data from cache, to avoid many database connections. Designing which data can reside in a cache depends on application.
+
+### Approached System Design Architecture
+
+![image](https://drive.google.com/uc?export=view&id=1w1pUOU4pFZv6NJYTpvjXa_9JM---7_9e)
+
+
+
 **Thank You**
