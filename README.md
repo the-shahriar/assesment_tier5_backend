@@ -65,14 +65,35 @@ You first need an account on Heroku;
 
 Refer to https://signup.heroku.com/login/
 
-After creating an acount open the command prompt from your project directory and paste the following command as like the screenshot 1
+After creating an acount open the command prompt from your project directory and paste the following command as like the screenshot,
+
+![App Screenshot](https://drive.google.com/file/d/1K0dmwepKV7EHKY4V5In1hww2wrnclpSd/view?usp=sharing)
 
 ```bash
 heroku login
 ```
 
-1. ![App Screenshot](https://drive.google.com/file/d/1K0dmwepKV7EHKY4V5In1hww2wrnclpSd/view?usp=sharing)
+After run this command you see the following page;
+![App Screenshot](https://drive.google.com/file/d/1hLpmAH2Z9zBtlvNFDuJ0cQHXb-VcnlGX/view?usp=sharing)
 
-After run this command you see the following page; 2. ![App Screenshot](https://drive.google.com/file/d/1hLpmAH2Z9zBtlvNFDuJ0cQHXb-VcnlGX/view?usp=sharing)
+Then you need to create a app on heroku just pasting the following command,
+
+![App Screenshot](https://drive.google.com/file/d/1ylb0AzhMAv0U9dR9wyYLnni28yhFEIOn/view?usp=sharing)
+
+```bash
+heroku create -a example-app
+```
+
+After that paste the command and your system will be ready and you will see a link after all the process finish.
+
+![App Screenshot](https://drive.google.com/file/d/1I2Id0tHa6HQNpMwpw1J2bkEPmY2GJJNM/view?usp=sharing)
+
+```bash
+git push heroku main
+```
+
+### Note: If you have any variable that is stored in .env, you need to put this variables in heroku project setting name reveal config vars--
+
+![App Screenshot](https://drive.google.com/file/d/1j-IlawdkbWgS-q0S4XhL2uopR6PDmLus/view?usp=sharing)
 
 **Thank You**
